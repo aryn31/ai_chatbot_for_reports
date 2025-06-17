@@ -8,13 +8,21 @@ uploaded_pdf_path = None  # Global state
 
 def upload_pdf(file):
     global uploaded_pdf_path
-    files = {'file': (file.name, file)}
+    if file is None:
+        return "❌ No file selected."
+    
+    with open(file.name, "rb") as f:
+        file_bytes = f.read()
+
+    files = {'file': (file.name, file_bytes, 'application/pdf')}
     response = requests.post(f"{API_URL}/upload", files=files)
+
     if response.status_code == 200:
-        uploaded_pdf_path = file.name
-        return f"✅ Uploaded: {file.name}"
+        uploaded_pdf_path = "✅"
+        return response.json().get("message", "✅ Uploaded.")
     else:
         return f"❌ Upload failed: {response.text}"
+
 
 
 def chatbot_fn(message, chat_history):
