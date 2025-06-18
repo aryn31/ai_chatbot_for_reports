@@ -7,7 +7,7 @@ def process_pdf(file_path: str):
     pages = loader.load()
 
     # Split pages into chunks
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
     chunks = splitter.split_documents(pages)
 
     # ✅ Add the source file name to each chunk's metadata

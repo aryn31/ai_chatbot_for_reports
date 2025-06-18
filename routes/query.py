@@ -28,8 +28,8 @@ def get_retriever():
 #     return "\n\n".join(doc.page_content for doc in docs)
 
 def format_docs(docs):
-    for i, doc in enumerate(docs):
-        print(f"🔹 Doc {i+1}: {doc.page_content[:200]}...\n")
+    # for i, doc in enumerate(docs):
+    #     print(f"🔹 Doc {i+1}: {doc.page_content[:200]}...\n")
     return "\n\n".join(doc.page_content for doc in docs)
 
 @router.get("/query")
