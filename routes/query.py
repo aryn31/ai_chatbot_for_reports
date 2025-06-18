@@ -11,7 +11,7 @@ router = APIRouter()
 
 # Prompt template with chat history
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are an assistant answering questions from a document."),
+    ("system", "You are an assistant answering questions based on the following context:\n\n{context}"),
     MessagesPlaceholder(variable_name="chat_history"),
     ("human", "{question}")
 ])
@@ -20,11 +20,16 @@ llm = get_llm()
 
 # Load retriever
 def get_retriever():
-    return load_vectorstore().as_retriever(search_kwargs={"k": 5})
+    return load_vectorstore().as_retriever(search_kwargs={"k": 100})
 
 # Format retrieved docs to string
+# def format_docs(docs):
+#     print(f"📄 Retrieved {len(docs)} docs")
+#     return "\n\n".join(doc.page_content for doc in docs)
+
 def format_docs(docs):
-    print(f"📄 Retrieved {len(docs)} docs")
+    for i, doc in enumerate(docs):
+        print(f"🔹 Doc {i+1}: {doc.page_content[:200]}...\n")
     return "\n\n".join(doc.page_content for doc in docs)
 
 @router.get("/query")
@@ -49,7 +54,7 @@ def query(q: str = Query(...)):
             | llm
             | StrOutputParser()
         )
-
+        print("using rag pipeline")
         # Invoke chain
         answer = rag_chain.invoke({
             "question": q,

@@ -31,8 +31,11 @@ async def upload_pdf(file: UploadFile = File(...)):
         print("📄 Processing PDF:", file_path)
         documents = process_pdf(file_path)
         print(f"🧾 Extracted {len(documents)} chunks from PDF.")
-
+        if not documents:
+            return {"error": "No readable content extracted from PDF."}
+        # print(documents)
         create_vectorstore(documents)
+        
     except Exception as e:
         return {"error": f"Processing failed: {str(e)}"}
     finally:
