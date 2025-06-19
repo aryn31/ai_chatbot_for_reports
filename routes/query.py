@@ -67,5 +67,5 @@ def query(q: str = Query(...)):
 
     # Save LLM response
     memory.chat_memory.add_ai_message(answer)
-    print(f"✅ Answer: {answer}")
+    # print(f"✅ Answer: {answer}")
     return {"answer": answer}
