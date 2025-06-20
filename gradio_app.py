@@ -1,12 +1,28 @@
 import gradio as gr
 import requests
 import mimetypes
+from datetime import datetime
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 API_URL = "http://localhost:8000"
 
 uploaded_pdf_path = None  # Global state
 
+def export_chat(chat_history):
+    lines = []
+    for message in chat_history:
+        role = message.get("role", "unknown").capitalize()
+        content = message.get("content", "")
+        lines.append(f"{role}: {content}\n\n")
 
+    filename = f"chat_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    with open(filename, "w") as f:
+        f.writelines(lines)
+
+    return filename
+
+        
 def upload_pdf(file):
     global uploaded_pdf_path
     if file is None:
@@ -54,6 +70,10 @@ with gr.Blocks() as demo:
         description="Ask questions from your uploaded PDF report.",
     )
 
+    export_btn=gr.Button("⬇️ Export Chat")
+    download_file=gr.File(label="Download Chat")
+
     upload_btn.click(fn=upload_pdf, inputs=file_input, outputs=upload_status)
+    export_btn.click(fn=export_chat, inputs=chat.chatbot, outputs=download_file)
 
 demo.launch()
