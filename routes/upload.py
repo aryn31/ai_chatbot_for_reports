@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File
 import shutil
 import os
 
-from services.pdf_processor import process_pdf
+from services.pdf_processor import process_document
 from services.vectorstore import create_vectorstore
 from services.memory import memory
 
@@ -28,14 +28,14 @@ async def upload_pdf(file: UploadFile = File(...)):
         return {"error": "Uploaded file is empty or corrupted."}
 
     try:
-        print("📄 Processing PDF:", file_path)
-        documents = process_pdf(file_path)
-        print(f"🧾 Extracted {len(documents)} chunks from PDF.")
+        print("📄 Processing PDF or Word File:", file_path)
+        documents = process_document(file_path)
+        print(f"🧾 Extracted {len(documents)} chunks from PDF or Word File.")
         if not documents:
-            return {"error": "No readable content extracted from PDF."}
+            return {"error": "No readable content extracted from PDF or Word File."}
         # print(documents)
         create_vectorstore(documents)
-        
+
     except Exception as e:
         return {"error": f"Processing failed: {str(e)}"}
     finally:

@@ -1,5 +1,6 @@
 import gradio as gr
 import requests
+import mimetypes
 
 API_URL = "http://localhost:8000"
 
@@ -14,7 +15,9 @@ def upload_pdf(file):
     with open(file.name, "rb") as f:
         file_bytes = f.read()
 
-    files = {'file': (file.name, file_bytes, 'application/pdf')}
+    # files = {'file': (file.name, file_bytes, 'application/pdf')}
+    mime_type, _ = mimetypes.guess_type(file.name)
+    files = {'file': (file.name, file_bytes, mime_type or 'application/octet-stream')}
     response = requests.post(f"{API_URL}/upload", files=files)
 
     if response.status_code == 200:
@@ -39,13 +42,13 @@ with gr.Blocks() as demo:
     gr.Markdown("# 🧠 PDF Q&A Chatbot with RAG")
 
     with gr.Row():
-        file_input = gr.File(label="📄 Upload PDF", file_types=[".pdf"])
+        file_input = gr.File(label="📄 Upload PDF", file_types=[".pdf",".docx"])
         upload_status = gr.Textbox(label="Upload Status", interactive=False)
         upload_btn = gr.Button("Upload PDF")
 
     chat = gr.ChatInterface(
         fn=chatbot_fn,
-        chatbot=gr.Chatbot(label="📘 Ask about your PDF"),
+        chatbot=gr.Chatbot(label="📘 Ask about your PDF",type='messages'),
         textbox=gr.Textbox(placeholder="Ask a question...", container=False),
         title="PDF Assistant",
         description="Ask questions from your uploaded PDF report.",
